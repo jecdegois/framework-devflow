@@ -4,7 +4,7 @@
 # Uso: bash init.sh <ruta-del-proyecto>
 #
 # Hace tres cosas sin pisar nada existente:
-# 1. Copia .workflow/ al proyecto destino
+# 1. Copia .devflow/ al proyecto destino
 # 2. Crea docs/specs/ y docs/plans/ si no existen
 # 3. Crea o fusiona AGENTS.md / CLAUDE.md / GEMINI.md
 
@@ -25,12 +25,12 @@ fi
 
 echo "Installing devflow into: $TARGET"
 
-# 1. Copiar .workflow/
-if [[ -d "$TARGET/.workflow" ]]; then
-  echo "  ⚠ .workflow/ already exists — skipping (delete it manually to reinstall)"
+# 1. Copiar .devflow/
+if [[ -d "$TARGET/.devflow" ]]; then
+  echo "  ⚠ .devflow/ already exists — skipping (delete it manually to reinstall)"
 else
-  cp -r "$DEVFLOW_DIR/.workflow" "$TARGET/.workflow"
-  echo "  ✓ Copied .workflow/"
+  cp -r "$DEVFLOW_DIR/.devflow" "$TARGET/.devflow"
+  echo "  ✓ Copied .devflow/"
 fi
 
 # 2. Crear docs/specs/ y docs/plans/
@@ -42,7 +42,7 @@ echo "  ✓ Created docs/specs/ and docs/plans/"
 ENTRY_LINE="
 ## Workflow
 
-El proceso de desarrollo de este proyecto está en \`.workflow/overview.md\`.
+El proceso de desarrollo de este proyecto está en \`.devflow/overview.md\`.
 Léelo antes de hacer cualquier cosa."
 
 for file in AGENTS.md GEMINI.md; do
@@ -51,11 +51,11 @@ for file in AGENTS.md GEMINI.md; do
 $ENTRY_LINE" > "$TARGET/$file"
     echo "  ✓ Created $file"
   else
-    if ! grep -q ".workflow/overview.md" "$TARGET/$file"; then
+    if ! grep -q ".devflow/overview.md" "$TARGET/$file"; then
       echo "$ENTRY_LINE" >> "$TARGET/$file"
       echo "  ✓ Updated $file (appended workflow reference)"
     else
-      echo "  ⚠ $file already references .workflow/overview.md — skipped"
+      echo "  ⚠ $file already references .devflow/overview.md — skipped"
     fi
   fi
 done
@@ -73,4 +73,4 @@ fi
 
 echo ""
 echo "devflow installed successfully."
-echo "Next: edit $TARGET/.workflow/conventions.md with your project's conventions."
+echo "Next: edit $TARGET/.devflow/conventions.md with your project's conventions."

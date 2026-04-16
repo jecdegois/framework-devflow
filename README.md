@@ -19,7 +19,7 @@ Cuando trabajas con un agente de IA (Claude Code, Codex, Gemini CLI, etc.), prob
 
 ## Cómo funciona
 
-devflow vive en una carpeta `.workflow/` dentro de tu proyecto. Cuando abres tu agente, lo primero que hace es leer esa carpeta y seguir el proceso definido ahí.
+devflow vive en una carpeta `.devflow/` dentro de tu proyecto. Cuando abres tu agente, lo primero que hace es leer esa carpeta y seguir el proceso definido ahí.
 
 El proceso tiene cuatro fases:
 
@@ -46,9 +46,13 @@ cd mi-proyecto
 rm -rf .git && git init
 ```
 
-Luego edita dos archivos:
-1. `AGENTS.md` — escribe de qué trata tu proyecto (2-3 líneas)
-2. `.workflow/conventions.md` — define tu stack, idioma del código y formato de commits
+Luego abre tu agente en el proyecto y corre:
+
+```
+/start
+```
+
+El agente detecta tu stack automáticamente, te hace las preguntas que necesita y escribe `AGENTS.md` y `.devflow/conventions.md` por ti.
 
 ### Opción B: Proyecto existente
 
@@ -59,7 +63,7 @@ bash /ruta/a/devflow-template/init.sh /ruta/a/mi-proyecto
 ```
 
 El script hace exactamente tres cosas:
-- Copia `.workflow/` a tu proyecto
+- Copia `.devflow/` a tu proyecto
 - Crea `docs/specs/` y `docs/plans/` si no existen
 - Agrega una línea al final de tu `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` apuntando al framework
 
@@ -194,7 +198,7 @@ El `overview.md` le instruye al agente: *si el usuario te corrige, documenta la 
 
 ## Hooks de automatización
 
-La carpeta `.workflow/hooks/` tiene dos scripts de ejemplo que puedes conectar a tu agente:
+La carpeta `.devflow/hooks/` tiene dos scripts de ejemplo que puedes conectar a tu agente:
 
 | Hook | Cuándo corre | Qué hace |
 |------|-------------|----------|
@@ -212,7 +216,7 @@ Para activarlos en Claude Code, agrega esto a `.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "bash .workflow/hooks/post-edit-format.sh $CLAUDE_TOOL_INPUT_FILE_PATH"
+            "command": "bash .devflow/hooks/post-edit-format.sh $CLAUDE_TOOL_INPUT_FILE_PATH"
           }
         ]
       }
@@ -227,7 +231,12 @@ Los scripts usan `prettier` y `pytest` como ejemplos. Cámbialos por las herrami
 
 ## Slash commands incluidos
 
-La carpeta `.workflow/commands/` tiene plantillas de comandos reutilizables:
+La carpeta `.devflow/commands/` tiene plantillas de comandos reutilizables:
+
+**`start`** — al abrir un proyecto por primera vez:
+- Explora el repo y detecta el stack automáticamente
+- Te hace preguntas guiadas sobre lo que no puede inferir
+- Escribe `conventions.md` y `AGENTS.md` con toda la información
 
 **`commit-push-pr`** — cuando tienes cambios listos:
 - Revisa el diff y el historial de commits
@@ -268,7 +277,7 @@ Con el estado activo, cuando retomes el proyecto el agente sabe exactamente dón
 ## Estructura completa del framework
 
 ```
-.workflow/
+.devflow/
 ├── overview.md              ← el agente lee esto primero en cada sesión
 ├── conventions.md           ← convenciones estáticas + correcciones aprendidas
 │
@@ -295,6 +304,7 @@ Con el estado activo, cuando retomes el proyecto el agente sabe exactamente dón
 │   └── post-edit-test.sh    ← corre tests al editar
 │
 ├── commands/
+│   ├── start.md             ← slash command: onboarding guiado del proyecto
 │   ├── commit-push-pr.md    ← slash command: commit + push + PR
 │   └── simplify.md          ← slash command: revisión de calidad
 │
@@ -311,10 +321,10 @@ devflow funciona con cualquier agente que lea archivos markdown:
 
 | Agente | Archivo de entrada |
 |--------|--------------------|
-| Claude Code | `CLAUDE.md` → `AGENTS.md` → `.workflow/overview.md` |
-| Codex / OpenCode | `AGENTS.md` → `.workflow/overview.md` |
-| Gemini CLI | `GEMINI.md` → `.workflow/overview.md` |
-| Cualquier otro | Apunta a `.workflow/overview.md` desde tu archivo de instrucciones |
+| Claude Code | `CLAUDE.md` → `AGENTS.md` → `.devflow/overview.md` |
+| Codex / OpenCode | `AGENTS.md` → `.devflow/overview.md` |
+| Gemini CLI | `GEMINI.md` → `.devflow/overview.md` |
+| Cualquier otro | Apunta a `.devflow/overview.md` desde tu archivo de instrucciones |
 
 ---
 

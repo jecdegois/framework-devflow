@@ -34,6 +34,16 @@ Tipos: feat | fix | chore | docs | refactor | test
 
 <!-- Añadir reglas específicas del proyecto -->
 
+## Prompts eficientes
+
+<!-- Estas reglas reducen tokens sin perder calidad -->
+
+- Ser específico: "agrega validación de email en `auth/login.ts`" gasta menos que "mejora el auth"
+- Un problema por mensaje: no agrupar múltiples cambios no relacionados en un solo prompt
+- Usar `/clear` al cambiar de feature — el contexto viejo es ruido y costo
+- Usar `/compact` cuando el contexto es grande pero hay trabajo en progreso
+- Actualizar `state/current-phase.md` antes de `/clear` para no perder el hilo
+
 ---
 
 ## Correcciones aprendidas

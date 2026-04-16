@@ -192,6 +192,44 @@ El `overview.md` le instruye al agente: *si el usuario te corrige, documenta la 
 
 ---
 
+## Cómo devflow ayuda a ahorrar tokens
+
+Trabajar con un agente sin estructura tiende a inflar el contexto: el agente relee archivos, redescubre decisiones que ya se tomaron y procesa ruido que no necesita. devflow ataca esto en tres niveles.
+
+### 1. Carga bajo demanda
+
+Los archivos de cada fase (`brainstorm/`, `plan/`, `execute/`, `finish/`) solo se leen cuando el agente entra a esa fase. El punto de entrada (`overview.md`) es mínimo — menos de 60 líneas. El agente no carga instrucciones de ejecución cuando estás en brainstorming, ni al revés.
+
+### 2. Estado como memoria persistente
+
+`state/current-phase.md` y `state/active-spec.md` guardan el contexto crítico del trabajo activo: fase, tarea, decisiones tomadas, archivos modificados. Esto habilita el hábito más eficiente de todos:
+
+```
+/clear   ← elimina todo el contexto acumulado
+```
+
+Con el estado actualizado, el agente puede retomar exactamente donde quedó en el siguiente mensaje — sin releer conversaciones anteriores ni redescubrir el contexto. **El estado es lo que hace seguro limpiar el contexto agresivamente.**
+
+El agente también sabe cuándo sugerirte hacer `/clear` (entre features distintos, cuando termina una tarea independiente) y cuándo usar `/compact` (trabajo en progreso que no conviene perder).
+
+### 3. Instrucciones de compactación
+
+Cuando el contexto se compacta, el agente sabe qué priorizar: correcciones aprendidas, plan activo y tarea en curso. No compacta al azar.
+
+### Hábitos recomendados
+
+| Situación | Claude Code | OpenCode | Codex |
+|-----------|-------------|----------|-------|
+| Terminaste un feature, empiezas otro | `/clear` | Nueva sesión | `/clear` |
+| Contexto grande, trabajo en progreso | `/compact` | Automático | Actualizar estado manualmente |
+| Retomar trabajo de una sesión anterior | `/resume` | Continuar sesión | `codex resume` |
+| Ver cuántos tokens llevas | `/cost` | Ver en UI | Indicador en TUI |
+| Corrección importante | El agente documenta en `conventions.md` antes de continuar | ← igual | ← igual |
+
+> En todos los casos, el agente actualiza `state/current-phase.md` antes de limpiar el contexto — eso es lo que hace seguro empezar de cero.
+
+---
+
 ## Hooks de automatización
 
 La carpeta `.devflow/hooks/` tiene dos scripts de ejemplo que puedes conectar a tu agente:
@@ -316,12 +354,13 @@ Con el estado activo, cuando retomes el proyecto el agente sabe exactamente dón
 
 devflow funciona con cualquier agente que lea archivos markdown:
 
-| Agente | Archivo de entrada |
-|--------|--------------------|
-| Claude Code | `CLAUDE.md` → `AGENTS.md` → `.devflow/overview.md` |
-| Codex / OpenCode | `AGENTS.md` → `.devflow/overview.md` |
-| Gemini CLI | `GEMINI.md` → `.devflow/overview.md` |
-| Cualquier otro | Apunta a `.devflow/overview.md` desde tu archivo de instrucciones |
+| Agente | Archivo de entrada | Slash commands | Limpiar contexto | Compactar |
+|--------|-------------------|----------------|-----------------|-----------|
+| Claude Code | `CLAUDE.md` → `AGENTS.md` → `.devflow/overview.md` | `.devflow/commands/*.md` via skills | `/clear` | `/compact` |
+| OpenCode | `AGENTS.md` → `.devflow/overview.md` | `.opencode/commands/*.md` | Nueva sesión | Automático |
+| Codex | `AGENTS.md` → `.devflow/overview.md` | En desarrollo | `/clear` | Manual (actualizar estado) |
+| Gemini CLI | `GEMINI.md` → `.devflow/overview.md` | — | Nueva sesión | — |
+| Cualquier otro | Apunta a `.devflow/overview.md` desde tu archivo de instrucciones | — | — | — |
 
 ---
 

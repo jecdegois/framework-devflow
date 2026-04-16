@@ -3,10 +3,11 @@
 # Adopta devflow en un proyecto existente.
 # Uso: bash init.sh <ruta-del-proyecto>
 #
-# Hace tres cosas sin pisar nada existente:
+# Hace cuatro cosas sin pisar nada existente:
 # 1. Copia .devflow/ al proyecto destino
 # 2. Crea docs/specs/ y docs/plans/ si no existen
 # 3. Crea o fusiona AGENTS.md / CLAUDE.md / GEMINI.md
+# 4. Copia .opencode/commands/ si OpenCode está instalado
 
 set -euo pipefail
 
@@ -71,6 +72,17 @@ else
   echo "  ⚠ CLAUDE.md already exists — skipped"
 fi
 
+# 4. Copiar .opencode/commands/ (para usuarios de OpenCode)
+if command -v opencode &>/dev/null || [[ -d "$TARGET/.opencode" ]]; then
+  if [[ -d "$TARGET/.opencode/commands" ]]; then
+    echo "  ⚠ .opencode/commands/ already exists — skipping"
+  else
+    mkdir -p "$TARGET/.opencode/commands"
+    cp "$DEVFLOW_DIR/.opencode/commands/"*.md "$TARGET/.opencode/commands/"
+    echo "  ✓ Copied .opencode/commands/ (OpenCode slash commands)"
+  fi
+fi
+
 echo ""
 echo "devflow installed successfully."
-echo "Next: edit $TARGET/.devflow/conventions.md with your project's conventions."
+echo "Next: open your agent and run /start-devflow to configure the project."

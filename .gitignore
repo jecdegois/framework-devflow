@@ -1,0 +1,3 @@
+# Estado opcional del proyecto (recomendado para repos de equipo)
+# Comentar si quieres versionar el estado
+# .workflow/state/

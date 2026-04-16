@@ -46,17 +46,11 @@ cd mi-proyecto
 rm -rf .git && git init
 ```
 
-Luego abre tu agente en el proyecto y corre:
-
-```
-/start
-```
-
-El agente detecta tu stack automáticamente, te hace las preguntas que necesita y escribe `AGENTS.md` y `.devflow/conventions.md` por ti.
+Luego abre tu agente y corre `/start-devflow`. El agente detecta que es un proyecto nuevo y te guía para definir las convenciones desde el inicio.
 
 ### Opción B: Proyecto existente
 
-Usa el script de adopción. No pisa nada que ya tengas:
+Usa el script de adopción para copiar devflow a tu proyecto:
 
 ```bash
 bash /ruta/a/devflow-template/init.sh /ruta/a/mi-proyecto
@@ -68,6 +62,8 @@ El script hace exactamente tres cosas:
 - Agrega una línea al final de tu `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` apuntando al framework
 
 Si cualquiera de esos archivos ya tiene la referencia, lo saltea.
+
+Luego abre tu agente y corre `/start-devflow`. El agente detecta que hay código existente, lee el proyecto, infiere el stack y solo te pregunta lo que no puede detectar.
 
 ---
 
@@ -233,9 +229,10 @@ Los scripts usan `prettier` y `pytest` como ejemplos. Cámbialos por las herrami
 
 La carpeta `.devflow/commands/` tiene plantillas de comandos reutilizables:
 
-**`start`** — al abrir un proyecto por primera vez:
-- Explora el repo y detecta el stack automáticamente
-- Te hace preguntas guiadas sobre lo que no puede inferir
+**`start-devflow`** — al adoptar devflow en cualquier proyecto:
+- Detecta automáticamente si es un proyecto nuevo o existente
+- En proyectos existentes, lee el código e infiere el stack; solo pregunta lo que no puede detectar
+- En proyectos nuevos, hace preguntas guiadas para definir las convenciones desde el inicio
 - Escribe `conventions.md` y `AGENTS.md` con toda la información
 
 **`commit-push-pr`** — cuando tienes cambios listos:
@@ -304,7 +301,7 @@ Con el estado activo, cuando retomes el proyecto el agente sabe exactamente dón
 │   └── post-edit-test.sh    ← corre tests al editar
 │
 ├── commands/
-│   ├── start.md             ← slash command: onboarding guiado del proyecto
+│   ├── start-devflow.md     ← slash command: onboarding guiado del proyecto
 │   ├── commit-push-pr.md    ← slash command: commit + push + PR
 │   └── simplify.md          ← slash command: revisión de calidad
 │
